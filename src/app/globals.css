@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-card: var(--card-bg);
+  --color-card-foreground: var(--card-fg);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-fg);
+  --color-secondary: var(--secondary-bg);
+  --color-secondary-foreground: var(--secondary-fg);
+  --color-muted: var(--muted-bg);
+  --color-muted-foreground: var(--muted-fg);
+  --color-accent: var(--accent-bg);
+  --color-accent-foreground: var(--accent-fg);
+  --color-border: var(--border-color);
+  --color-ring: var(--ring-color);
+
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-serif: "Source Serif 4", Georgia, serif;
+}
+
+:root {
+  --bg: #fafafa;
+  --fg: #0a0a0a;
+  --card-bg: #fff;
+  --card-fg: #0a0a0a;
+  --primary: #e85854;
+  --primary-fg: #fff6f5;
+  --secondary-bg: #f4f4f5;
+  --secondary-fg: #18181b;
+  --muted-bg: #f2f2f2;
+  --muted-fg: #555;
+  --accent-bg: #f2f2f2;
+  --accent-fg: #171717;
+  --border-color: #dedede;
+  --ring-color: #e85854;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(222, 222, 222, 0.5);
+}
+
+.dark {
+  --bg: #060606;
+  --fg: #e8e8e8;
+  --card-bg: #0d0d0d;
+  --card-fg: #e8e8e8;
+  --primary: #f97770;
+  --primary-fg: #130807;
+  --secondary-bg: #1b1b1b;
+  --secondary-fg: #e8e8e8;
+  --muted-bg: #161616;
+  --muted-fg: gray;
+  --accent-bg: #1b1b1b;
+  --accent-fg: #e8e8e8;
+  --border-color: #222;
+  --ring-color: #f97770;
+  --glass-bg: rgba(13, 17, 23, 0.7);
+  --glass-border: rgba(48, 54, 61, 0.5);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: var(--primary);
+  color: var(--primary-fg);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+a {
+  transition: color 0.15s ease;
+}
+
+/* Glassmorphism utility */
+.glass {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background-color: var(--glass-bg);
+  border-color: var(--glass-border);
+}
+
+/* Link preview popup animation */
+@keyframes previewIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100%) scale(0.95) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1) translateY(0);
+  }
+}
+
+.animate-preview-in {
+  animation: previewIn 0.2s ease-out forwards;
+}
+
+/* Terminal slide-in animation */
+@keyframes terminalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Blinking cursor */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor-blink {
+  animation: cursorBlink 1s step-end infinite;
+}
+
+/* Theme ripple transition */
+@keyframes rippleExpand {
+  from {
+    clip-path: circle(0% at var(--ripple-x) var(--ripple-y));
+  }
+  to {
+    clip-path: circle(150vmax at var(--ripple-x) var(--ripple-y));
+  }
+}
+
+.theme-ripple {
+  animation: rippleExpand 0.6s ease-out forwards;
+}
+
+/* View Transitions */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+}
+
+/* Spine glow pulse */
+@keyframes spinePulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(63, 185, 80, 0.3); }
+  50% { box-shadow: 0 0 16px rgba(63, 185, 80, 0.6); }
+}
+
+.spine-dot-active {
+  animation: spinePulse 2s ease-in-out infinite;
+}
+
+/* Stagger children animation */
+.stagger-child {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: staggerFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes staggerFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
