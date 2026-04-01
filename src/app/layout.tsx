@@ -3,6 +3,7 @@ import "./globals.css";
 import ThemeToggle from "@/components/ThemeToggle";
 import InteractiveTerminal from "@/components/InteractiveTerminal";
 import CommandPalette from "@/components/CommandPalette";
+import KonamiEasterEgg from "@/components/KonamiEasterEgg";
 
 export const metadata: Metadata = {
   title: "Subrat Ojha — Full-Stack Java Developer",
@@ -55,6 +56,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground">
         <ThemeToggle />
         <CommandPalette />
+        <KonamiEasterEgg />
         {children}
         <InteractiveTerminal />
       </body>

@@ -18,6 +18,13 @@ import GitBranchConnections from "@/components/GitBranchConnections";
 import GitCloneResume from "@/components/GitCloneResume";
 import VisitorCounter from "@/components/VisitorCounter";
 import StatusBar from "@/components/StatusBar";
+import TypewriterReadme from "@/components/TypewriterReadme";
+import GitGraph from "@/components/GitGraph";
+import GitActionsWorkflow from "@/components/GitActionsWorkflow";
+import PRReviews from "@/components/PRReviews";
+import AchievementBadges from "@/components/AchievementBadges";
+import NowPlaying from "@/components/NowPlaying";
+import MergeConflict from "@/components/MergeConflict";
 
 export default function Home() {
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
@@ -57,12 +64,33 @@ export default function Home() {
 
             <hr className="border-border my-10" />
 
+            {/* README - Typewriter Profile */}
+            <section id="readme">
+              <AnimatedSection variant="fade-up">
+                <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">About Me</h2>
+                <TypewriterReadme />
+              </AnimatedSection>
+            </section>
+
+            <hr className="border-border my-10" />
+
             {/* Career Evolution - GitHub Diff */}
             <section id="career">
-              <AnimatedSection delay={100} variant="fade-up">
+              <AnimatedSection variant="fade-up">
                 <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Career Evolution</h2>
                 <p className="text-sm text-muted-foreground mb-4">How my stack has evolved over time:</p>
                 <GitDiff />
+              </AnimatedSection>
+            </section>
+
+            <hr className="border-border my-10" />
+
+            {/* Career Graph - git log --graph */}
+            <section id="graph">
+              <AnimatedSection variant="fade-left">
+                <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Career Path</h2>
+                <p className="text-sm text-muted-foreground mb-4">Branch history of my journey:</p>
+                <GitGraph />
               </AnimatedSection>
             </section>
 
@@ -88,11 +116,32 @@ export default function Home() {
 
             <hr className="border-border my-10" />
 
+            {/* CI/CD Pipeline */}
+            <section id="pipeline">
+              <AnimatedSection variant="fade-up">
+                <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">How I Ship Code</h2>
+                <GitActionsWorkflow />
+              </AnimatedSection>
+            </section>
+
+            <hr className="border-border my-10" />
+
             {/* Projects - PR Cards */}
             <section id="projects">
               <AnimatedSection variant="stagger" staggerDelay={100}>
                 <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-6">Projects</h2>
                 <ProjectPRCards />
+              </AnimatedSection>
+            </section>
+
+            <hr className="border-border my-10" />
+
+            {/* PR Reviews / Testimonials */}
+            <section id="reviews">
+              <AnimatedSection variant="fade-up">
+                <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Code Reviews</h2>
+                <p className="text-sm text-muted-foreground mb-4">What people say about working with me:</p>
+                <PRReviews />
               </AnimatedSection>
             </section>
 
@@ -108,12 +157,42 @@ export default function Home() {
 
             <hr className="border-border my-10" />
 
+            {/* Achievement Badges */}
+            <section id="achievements">
+              <AnimatedSection variant="fade-up">
+                <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Achievements</h2>
+                <AchievementBadges />
+              </AnimatedSection>
+            </section>
+
+            <hr className="border-border my-10" />
+
             {/* Git Stash - Learning */}
             <section id="stash">
               <AnimatedSection variant="fade-up">
                 <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Currently Learning</h2>
                 <p className="text-sm text-muted-foreground mb-4">Things I&apos;m exploring next — stashed for later:</p>
                 <GitStash />
+              </AnimatedSection>
+            </section>
+
+            <hr className="border-border my-10" />
+
+            {/* Now Playing / Current Status */}
+            <section id="now">
+              <AnimatedSection variant="fade-right">
+                <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Current Status</h2>
+                <NowPlaying />
+              </AnimatedSection>
+            </section>
+
+            <hr className="border-border my-10" />
+
+            {/* Merge Conflict - Work vs Life */}
+            <section id="conflict">
+              <AnimatedSection variant="fade-up">
+                <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">Work-Life Balance</h2>
+                <MergeConflict />
               </AnimatedSection>
             </section>
 
@@ -178,7 +257,7 @@ export default function Home() {
                 </a>
                 .
               </p>
-              <p className="text-[10px]">Press Ctrl+K to navigate</p>
+              <p className="text-[10px]">Press Ctrl+K to navigate -- Konami code unlocks a surprise</p>
             </footer>
           </div>
 
