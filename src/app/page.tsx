@@ -15,6 +15,9 @@ import FileTreeSidebar from "@/components/FileTreeSidebar";
 import GitStash from "@/components/GitStash";
 import GitBlame from "@/components/GitBlame";
 import GitBranchConnections from "@/components/GitBranchConnections";
+import GitCloneResume from "@/components/GitCloneResume";
+import VisitorCounter from "@/components/VisitorCounter";
+import StatusBar from "@/components/StatusBar";
 
 export default function Home() {
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
@@ -28,7 +31,7 @@ export default function Home() {
 
   return (
     <ScrollSectionProvider>
-      <div className="relative max-w-5xl mx-auto px-4" data-spine-container>
+      <div className="relative max-w-5xl mx-auto px-3 sm:px-4" data-spine-container>
         {/* SVG branch connections overlay */}
         <GitBranchConnections />
 
@@ -37,13 +40,20 @@ export default function Home() {
           <CommitSpine />
 
           {/* Center: Main Content */}
-          <div className="max-w-2xl w-full py-12 md:py-20">
+          <div className="max-w-2xl w-full min-w-0 py-8 sm:py-12 md:py-20">
             {/* Hero - Terminal CLI */}
             <section id="hero">
               <AnimatedSection>
                 <TerminalHero />
               </AnimatedSection>
             </section>
+
+            {/* Resume Download */}
+            <div className="my-6">
+              <AnimatedSection delay={200}>
+                <GitCloneResume />
+              </AnimatedSection>
+            </div>
 
             <hr className="border-border my-10" />
 
@@ -147,8 +157,15 @@ export default function Home() {
               </div>
             </AnimatedSection>
 
+            {/* Visitor Counter */}
+            <AnimatedSection>
+              <div className="mb-6">
+                <VisitorCounter />
+              </div>
+            </AnimatedSection>
+
             {/* Footer */}
-            <footer className="border-t border-border pt-6 pb-8 text-xs text-muted-foreground font-mono space-y-1">
+            <footer className="border-t border-border pt-6 pb-12 text-xs text-muted-foreground font-mono space-y-1">
               <p>&copy; {new Date().getFullYear()} Subrat Ojha</p>
               <p>
                 Built by{" "}
@@ -161,6 +178,7 @@ export default function Home() {
                 </a>
                 .
               </p>
+              <p className="text-[10px]">Press Ctrl+K to navigate</p>
             </footer>
           </div>
 
@@ -168,6 +186,7 @@ export default function Home() {
           <FileTreeSidebar />
         </div>
       </div>
+      <StatusBar />
     </ScrollSectionProvider>
   );
 }

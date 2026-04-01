@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 interface PRCardProps {
   number: number;
   title: string;
@@ -162,7 +164,7 @@ function PRCard({
   );
 }
 
-const projects: PRCardProps[] = [
+const staticProjects: PRCardProps[] = [
   {
     number: 1,
     title: "Gratis",
@@ -201,12 +203,78 @@ const projects: PRCardProps[] = [
   },
 ];
 
+interface GitHubRepo {
+  name: string;
+  description: string;
+  url: string;
+  language: string | null;
+  stars: number;
+  forks: number;
+  topics: string[];
+}
+
+const LANG_TAG: Record<string, { bg: string; text: string }> = {
+  Java: { bg: "rgba(219, 124, 38, 0.16)", text: "#f0883e" },
+  JavaScript: { bg: "rgba(241, 224, 90, 0.16)", text: "#f1e05a" },
+  TypeScript: { bg: "rgba(49, 120, 198, 0.16)", text: "#3178c6" },
+  Python: { bg: "rgba(53, 114, 165, 0.16)", text: "#3572a5" },
+  HTML: { bg: "rgba(227, 76, 38, 0.16)", text: "#e34c26" },
+  CSS: { bg: "rgba(86, 61, 124, 0.16)", text: "#563d7c" },
+};
+
 export default function ProjectPRCards() {
+  const [liveRepos, setLiveRepos] = useState<GitHubRepo[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/repos")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.repos?.length > 0) setLiveRepos(data.repos);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  // Merge: use static as base, overlay live repos that match by name, append new ones
+  const staticNames = new Set(staticProjects.map((p) => p.title.toLowerCase()));
+  const extraRepos = liveRepos.filter(
+    (r) => !staticNames.has(r.name.toLowerCase())
+  );
+
+  const dynamicCards: PRCardProps[] = extraRepos.slice(0, 3).map((repo, i) => {
+    const tags = [
+      ...(repo.language ? [repo.language] : []),
+      ...repo.topics.filter((t) => t !== repo.language?.toLowerCase()),
+    ].slice(0, 4);
+
+    // Register dynamic language colors
+    if (repo.language && !(repo.language in TAG_COLORS) && repo.language in LANG_TAG) {
+      TAG_COLORS[repo.language] = LANG_TAG[repo.language];
+    }
+
+    return {
+      number: staticProjects.length + i + 1,
+      title: repo.name,
+      desc: repo.description,
+      status: "open" as const,
+      tags,
+      url: repo.url,
+    };
+  });
+
+  const allProjects = [...staticProjects, ...dynamicCards];
+
   return (
     <div className="flex flex-col gap-3">
-      {projects.map((project) => (
+      {allProjects.map((project) => (
         <PRCard key={project.number} {...project} />
       ))}
+      {!loaded && (
+        <div className="text-xs font-mono text-[#8b949e] animate-pulse">
+          Fetching repos from GitHub...
+        </div>
+      )}
     </div>
   );
 }

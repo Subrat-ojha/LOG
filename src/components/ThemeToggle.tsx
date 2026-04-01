@@ -1,6 +1,36 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
+
+function spawnParticles(x: number, y: number, toDark: boolean) {
+  const count = 18;
+  const chars = "01{};<>/=()";
+  for (let i = 0; i < count; i++) {
+    const span = document.createElement("span");
+    const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+    const dist = 30 + Math.random() * 60;
+    const char = chars[Math.floor(Math.random() * chars.length)];
+    span.textContent = char;
+    span.style.cssText = `
+      position: fixed;
+      left: ${x}px;
+      top: ${y}px;
+      z-index: 10000;
+      pointer-events: none;
+      font-family: monospace;
+      font-size: ${9 + Math.random() * 5}px;
+      color: ${toDark ? "#3fb950" : "#539bf5"};
+      opacity: 1;
+      transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    `;
+    document.body.appendChild(span);
+    requestAnimationFrame(() => {
+      span.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) rotate(${Math.random() * 180}deg)`;
+      span.style.opacity = "0";
+    });
+    setTimeout(() => span.remove(), 650);
+  }
+}
 
 export default function ThemeToggle() {
   const [dark, setDark] = useState(true);
@@ -29,6 +59,8 @@ export default function ThemeToggle() {
 
     const x = e.clientX;
     const y = e.clientY;
+
+    spawnParticles(x, y, next);
 
     const applyTheme = () => {
       setDark(next);
@@ -67,15 +99,15 @@ export default function ThemeToggle() {
       ref={buttonRef}
       onClick={toggle}
       aria-label="Toggle theme"
-      className="fixed top-5 right-5 z-50 w-9 h-9 rounded-lg flex items-center justify-center border transition-all duration-300 hover:scale-110"
+      className="fixed top-4 right-4 z-50 w-7 h-7 rounded-md flex items-center justify-center border transition-all duration-300 hover:scale-110"
       style={{
         backgroundColor: dark ? "#161b22" : "#f6f8fa",
         borderColor: dark ? "#30363d" : "#d0d7de",
       }}
     >
       <svg
-        width="18"
-        height="18"
+        width="14"
+        height="14"
         viewBox="0 0 24 24"
         fill="none"
         stroke={dark ? "#e3b341" : "#539bf5"}

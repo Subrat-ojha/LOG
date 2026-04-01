@@ -24,15 +24,15 @@ export default function IssueContact({
   return (
     <div className="w-full rounded-md border border-[#30363d] bg-[#0d1117]/80 backdrop-blur-md overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#30363d] px-4 py-3 sm:px-6">
-        <h2 className="font-mono text-lg font-semibold text-[#e6edf3]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-[#30363d] px-4 py-3 sm:px-6">
+        <h2 className="font-mono text-base sm:text-lg font-semibold text-[#e6edf3]">
           New Issue
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           {labels.map((label) => (
             <span
               key={label.text}
-              className="cursor-default select-none rounded-full border px-2.5 py-0.5 font-mono text-xs leading-tight"
+              className="cursor-default select-none rounded-full border px-2 sm:px-2.5 py-0.5 font-mono text-[10px] sm:text-xs leading-tight"
               style={{
                 borderColor: label.color,
                 color: label.color,
@@ -124,8 +124,8 @@ export default function IssueContact({
         </div>
 
         {/* Bottom bar */}
-        <div className="flex items-center justify-between border-t border-[#30363d] pt-4">
-          <span className="text-xs text-[#484f58]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-[#30363d] pt-4">
+          <span className="text-[11px] sm:text-xs text-[#484f58]">
             Reach me at{" "}
             <span className="font-mono text-[#8b949e]">
               iamsubratojha@gmail.com
@@ -133,7 +133,7 @@ export default function IssueContact({
           </span>
           <button
             type="submit"
-            className="rounded-md bg-[#238636] px-4 py-1.5 font-mono text-sm font-semibold text-white transition-colors hover:bg-[#2ea043]"
+            className="rounded-md bg-[#238636] px-4 py-1.5 font-mono text-sm font-semibold text-white transition-colors hover:bg-[#2ea043] w-full sm:w-auto"
           >
             Submit new issue
           </button>

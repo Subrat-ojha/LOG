@@ -2,18 +2,16 @@
 
 import { useState, useEffect, useMemo } from "react";
 
+interface ContributionDay {
+  date: string;
+  count: number; // 0-4 level from GitHub
+}
+
 interface GitHubEvent {
   id: string;
   type: string;
   repo: { name: string };
   created_at: string;
-  payload?: Record<string, unknown>;
-}
-
-interface DayData {
-  date: string;
-  count: number;
-  dayOfWeek: number;
 }
 
 function getEventLabel(type: string): string {
@@ -61,60 +59,48 @@ function timeAgo(dateStr: string): string {
   return `${months}mo ago`;
 }
 
-function getColor(count: number): string {
-  if (count === 0) return "#161b22";
-  if (count <= 2) return "#0e4429";
-  if (count <= 4) return "#006d32";
-  if (count <= 7) return "#26a641";
-  return "#39d353";
-}
-
-const MONTH_LABELS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
+const LEVEL_COLORS = [
+  "#161b22", // 0 - none
+  "#0e4429", // 1
+  "#006d32", // 2
+  "#26a641", // 3
+  "#39d353", // 4
 ];
 
-const LEGEND_COLORS = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"];
+const MONTH_LABELS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
 
 export default function GitHubActivity() {
+  const [contributions, setContributions] = useState<ContributionDay[]>([]);
+  const [totalYear, setTotalYear] = useState<number | null>(null);
   const [events, setEvents] = useState<GitHubEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    async function fetchEvents() {
+    async function fetchData() {
       try {
-        const [res1, res2] = await Promise.all([
+        const [contribRes, eventsRes] = await Promise.all([
+          fetch("/api/github"),
           fetch(
-            "https://api.github.com/users/Subrat-ojha/events/public?per_page=100&page=1"
-          ),
-          fetch(
-            "https://api.github.com/users/Subrat-ojha/events/public?per_page=100&page=2"
+            "https://api.github.com/users/Subrat-ojha/events/public?per_page=5&page=1"
           ),
         ]);
 
-        if (res1.status === 403 || res2.status === 403) {
-          setError(true);
-          setLoading(false);
-          return;
+        if (contribRes.ok) {
+          const data = await contribRes.json();
+          setContributions(data.days || []);
+          if (data.totalContributions != null) {
+            setTotalYear(data.totalContributions);
+          }
         }
 
-        const [data1, data2] = await Promise.all([
-          res1.ok ? res1.json() : [],
-          res2.ok ? res2.json() : [],
-        ]);
-
-        setEvents([...data1, ...data2]);
+        if (eventsRes.ok && eventsRes.status !== 403) {
+          const evData = await eventsRes.json();
+          setEvents(evData);
+        }
       } catch {
         setError(true);
       } finally {
@@ -122,43 +108,41 @@ export default function GitHubActivity() {
       }
     }
 
-    fetchEvents();
+    fetchData();
   }, []);
 
   const { grid, totalContributions, monthLabels } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const dayOfWeek = today.getDay(); // 0=Sun
+    const dayOfWeek = today.getDay();
     const endOfWeek = new Date(today);
     endOfWeek.setDate(today.getDate() + (6 - dayOfWeek));
 
-    const totalDays = 16 * 7;
+    // Show ~52 weeks (full year) but cap display at 20 weeks for compact view
+    const displayWeeks = 20;
+    const totalDays = displayWeeks * 7;
     const startDate = new Date(endOfWeek);
     startDate.setDate(endOfWeek.getDate() - totalDays + 1);
 
-    // Count events per day
-    const countMap: Record<string, number> = {};
-    for (const event of events) {
-      const dateStr = event.created_at.slice(0, 10);
-      countMap[dateStr] = (countMap[dateStr] || 0) + 1;
+    // Build a lookup from contributions
+    const levelMap: Record<string, number> = {};
+    for (const day of contributions) {
+      levelMap[day.date] = day.count;
     }
 
-    // Build grid: 16 columns (weeks), 7 rows (Sun=0 to Sat=6)
-    const weeks: DayData[][] = [];
+    const weeks: { date: string; level: number; dayOfWeek: number }[][] = [];
     const mLabels: { weekIndex: number; label: string }[] = [];
     let total = 0;
     let lastMonth = -1;
 
     const cursor = new Date(startDate);
-    for (let w = 0; w < 16; w++) {
-      const week: DayData[] = [];
+    for (let w = 0; w < displayWeeks; w++) {
+      const week: { date: string; level: number; dayOfWeek: number }[] = [];
       for (let d = 0; d < 7; d++) {
         const dateStr = cursor.toISOString().slice(0, 10);
-        const count = countMap[dateStr] || 0;
         const dow = cursor.getDay();
 
-        // Track month label on first day of each week
         if (d === 0) {
           const month = cursor.getMonth();
           if (month !== lastMonth) {
@@ -167,12 +151,12 @@ export default function GitHubActivity() {
           }
         }
 
-        // Only include days up to today
         if (cursor <= today) {
-          total += count;
-          week.push({ date: dateStr, count, dayOfWeek: dow });
+          const level = levelMap[dateStr] ?? 0;
+          total += level > 0 ? 1 : 0; // count days with contributions
+          week.push({ date: dateStr, level, dayOfWeek: dow });
         } else {
-          week.push({ date: dateStr, count: -1, dayOfWeek: dow }); // future
+          week.push({ date: dateStr, level: -1, dayOfWeek: dow }); // future
         }
 
         cursor.setDate(cursor.getDate() + 1);
@@ -181,9 +165,12 @@ export default function GitHubActivity() {
     }
 
     return { grid: weeks, totalContributions: total, monthLabels: mLabels };
-  }, [events]);
+  }, [contributions]);
 
   const recentEvents = events.slice(0, 3);
+  const contribLabel = totalYear != null
+    ? `${totalYear.toLocaleString()} contributions in the last year`
+    : `${totalContributions} active days in the last 20 weeks`;
 
   return (
     <div
@@ -192,21 +179,21 @@ export default function GitHubActivity() {
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 py-3 border-b"
+        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 px-3 sm:px-4 py-2.5 sm:py-3 border-b"
         style={{ backgroundColor: "#161b22", borderColor: "#30363d" }}
       >
-        <span className="text-xs" style={{ color: "#c9d1d9" }}>
-          {totalContributions} contributions in the last 16 weeks
+        <span className="text-[11px] sm:text-xs" style={{ color: "#c9d1d9" }}>
+          {contribLabel}
         </span>
         <div className="flex items-center gap-1 text-[10px]" style={{ color: "#8b949e" }}>
           <span>Less</span>
-          {LEGEND_COLORS.map((color) => (
+          {LEVEL_COLORS.map((color) => (
             <div
               key={color}
               className="rounded-[2px]"
               style={{
-                width: 11,
-                height: 11,
+                width: 10,
+                height: 10,
                 backgroundColor: color,
               }}
             />
@@ -216,14 +203,13 @@ export default function GitHubActivity() {
       </div>
 
       {/* Grid */}
-      <div className="px-4 py-3 overflow-x-auto">
+      <div className="px-3 sm:px-4 py-3 overflow-x-auto">
         <div className="flex gap-0">
           {/* Day labels column */}
           <div
             className="flex flex-col text-[10px] pr-2 shrink-0"
             style={{ color: "#8b949e", gap: 3 }}
           >
-            {/* Spacer for month labels row */}
             <div style={{ height: 14 }} />
             {[0, 1, 2, 3, 4, 5, 6].map((d) => (
               <div
@@ -262,7 +248,7 @@ export default function GitHubActivity() {
                       />
                     );
                   }
-                  const isFuture = day.count === -1;
+                  const isFuture = day.level === -1;
                   return (
                     <div
                       key={di}
@@ -270,14 +256,14 @@ export default function GitHubActivity() {
                       title={
                         isFuture
                           ? undefined
-                          : `${day.date}: ${day.count} event${day.count !== 1 ? "s" : ""}`
+                          : `${day.date}: level ${day.level}`
                       }
                       style={{
                         width: 11,
                         height: 11,
                         backgroundColor: isFuture
                           ? "#0d1117"
-                          : getColor(day.count),
+                          : LEVEL_COLORS[day.level] || "#161b22",
                       }}
                     />
                   );
@@ -287,7 +273,6 @@ export default function GitHubActivity() {
           </div>
         </div>
 
-        {/* Error message */}
         {error && (
           <p className="text-[11px] mt-2" style={{ color: "#8b949e" }}>
             Could not load activity
@@ -298,7 +283,7 @@ export default function GitHubActivity() {
       {/* Recent events */}
       {recentEvents.length > 0 && (
         <div
-          className="px-4 py-3 border-t flex flex-col gap-1.5"
+          className="px-3 sm:px-4 py-3 border-t flex flex-col gap-1.5"
           style={{ borderColor: "#30363d" }}
         >
           {recentEvents.map((event) => (

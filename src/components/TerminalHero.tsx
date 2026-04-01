@@ -1,6 +1,25 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+
+function playKeyClick() {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "square";
+    osc.frequency.setValueAtTime(1800 + Math.random() * 600, ctx.currentTime);
+    gain.gain.setValueAtTime(0.03, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.05);
+    setTimeout(() => ctx.close(), 100);
+  } catch {
+    // Audio not available
+  }
+}
 
 const INFO_LINES = [
   { label: "name", value: "Subrat Ojha" },
@@ -28,6 +47,7 @@ export default function TerminalHero() {
     const typeInterval = setInterval(() => {
       charIndex++;
       setTypedChars(charIndex);
+      playKeyClick();
       if (charIndex >= COMMAND.length) {
         clearInterval(typeInterval);
         // Show ASCII art

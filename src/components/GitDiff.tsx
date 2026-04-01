@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type LineType = "add" | "remove" | "context";
 
@@ -62,6 +62,34 @@ function getPrefix(type: LineType) {
 
 export default function GitDiff() {
   const [tooltipLine, setTooltipLine] = useState<number | null>(null);
+  const [visibleLines, setVisibleLines] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (hasAnimated) return;
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          let i = 0;
+          const interval = setInterval(() => {
+            i++;
+            setVisibleLines(i);
+            if (i >= diffLines.length) clearInterval(interval);
+          }, 40);
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasAnimated]);
+
   let addNum = 0;
   let removeNum = 0;
 
@@ -69,7 +97,7 @@ export default function GitDiff() {
   const deletions = diffLines.filter((l) => l.type === "remove").length;
 
   return (
-    <div className="rounded-md border border-[#30363d] overflow-hidden font-mono text-xs glass">
+    <div ref={containerRef} className="rounded-md border border-[#30363d] overflow-hidden font-mono text-xs glass">
       {/* File header */}
       <div className="flex items-center justify-between px-3 py-2 bg-[#161b22] border-b border-[#30363d]">
         <span className="text-[13px] text-[#e6edf3]">developer.yml</span>
@@ -86,7 +114,7 @@ export default function GitDiff() {
 
       {/* Lines */}
       <div className="bg-[#0d1117]/80 overflow-x-auto">
-        {diffLines.map((line, i) => {
+        {diffLines.slice(0, hasAnimated ? visibleLines : diffLines.length).map((line, i) => {
           let leftNum = "";
           let rightNum = "";
 
