@@ -7,7 +7,7 @@ export interface SectionEntry {
 
 export const sections: SectionEntry[] = [
   { id: "hero", label: "Hero", icon: "file", filename: "hero.tsx" },
-  { id: "readme", label: "README", icon: "md", filename: "README.md" },
+  { id: "about", label: "About", icon: "file", filename: "about.json" },
   { id: "career", label: "Career Evolution", icon: "diff", filename: "career.diff" },
   { id: "graph", label: "Career Graph", icon: "graph", filename: "git-graph.log" },
   { id: "tech-stack", label: "Tech Stack", icon: "graph", filename: "skills.graph" },

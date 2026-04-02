@@ -18,7 +18,7 @@ import GitBranchConnections from "@/components/GitBranchConnections";
 import GitCloneResume from "@/components/GitCloneResume";
 import VisitorCounter from "@/components/VisitorCounter";
 import StatusBar from "@/components/StatusBar";
-import TypewriterReadme from "@/components/TypewriterReadme";
+import PullRequestAbout from "@/components/PullRequestAbout";
 import GitGraph from "@/components/GitGraph";
 import GitActionsWorkflow from "@/components/GitActionsWorkflow";
 import PRReviews from "@/components/PRReviews";
@@ -64,11 +64,11 @@ export default function Home() {
 
             <hr className="border-border my-10" />
 
-            {/* README - Typewriter Profile */}
-            <section id="readme">
+            {/* About Me - Pull Request */}
+            <section id="about">
               <AnimatedSection variant="fade-up">
                 <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4">About Me</h2>
-                <TypewriterReadme />
+                <PullRequestAbout />
               </AnimatedSection>
             </section>
 

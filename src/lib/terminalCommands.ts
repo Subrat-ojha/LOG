@@ -146,7 +146,7 @@ export function executeCommand(input: string): { output: string[]; clear?: boole
       };
 
     case "cat":
-      if (args === "about.md" || args === "README.md") {
+      if (args === "about.md" || args === "README.md" || args === "about.json") {
         return { output: aboutContent };
       }
       if (args === "career.diff") {
