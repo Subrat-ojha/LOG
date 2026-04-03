@@ -25,6 +25,7 @@ import PRReviews from "@/components/PRReviews";
 import AchievementBadges from "@/components/AchievementBadges";
 import NowPlaying from "@/components/NowPlaying";
 import MergeConflict from "@/components/MergeConflict";
+import CopilotChat from "@/components/CopilotChat";
 
 export default function Home() {
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
@@ -265,6 +266,7 @@ export default function Home() {
           <FileTreeSidebar />
         </div>
       </div>
+      <CopilotChat />
       <StatusBar />
     </ScrollSectionProvider>
   );

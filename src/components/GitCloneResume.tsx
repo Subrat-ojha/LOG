@@ -23,7 +23,7 @@ export default function GitCloneResume() {
     // Trigger actual download
     const a = document.createElement("a");
     a.href = "/resume.pdf";
-    a.download = "resume.pdf";
+    a.download = "Subrat_Resume.pdf";
     a.click();
 
     // Start animation sequence
